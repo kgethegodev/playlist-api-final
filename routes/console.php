@@ -27,7 +27,7 @@ Artisan::command('spotify:me', function() {
 });
 
 Artisan::command('spotify:add', function() {
-  $playlist = Playlist::findOrFail(21)->first();
+  $playlist = Playlist::find(6);
   $uri_array = [];
   $spotify = new SpotifyService();
   foreach(json_decode($playlist->songs) as $song) {

@@ -12,7 +12,7 @@ class SpotifyService
 
     public function __construct()
     {
-        $this->access_token = SpotifyToken::first()->spotify_access_token;
+        $this->access_token = SpotifyToken::firstOrFail()->spotify_access_token;
         $user = $this->me();
         $this->user_id = $user['id'];
     }
@@ -38,10 +38,14 @@ class SpotifyService
     public function addItemToPlaylist(string $playlist_id, array $uri_array)
     {
         $data = [
-            'uris' => $uri_array
+            'uris'      => $uri_array,
+            'position'  => 0
         ];
 
-        $response = Http::withToken($this->access_token)->post(config('spotify.url') . '/playlists/' . $playlist_id . '/tracks', $data);
+        $response = Http::withToken($this->access_token)->withHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => 0,
+        ])->post(config('spotify.url') . '/playlists/' . $playlist_id . '/tracks', $data);
 
         dd($response);
 

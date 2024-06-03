@@ -54,7 +54,7 @@ class PlaylistController extends Controller
             $songs = json_decode($jsonString, true);
 
             if(!$title || !$description || !$songs){
-                error(json_encode([
+                log(json_encode([
                     'message'       => 'input missing',
                     'input_string'  => $input_string,
                     'title'         => trim($title),
@@ -91,5 +91,32 @@ class PlaylistController extends Controller
             return response()->json($e->getMessage(), 400);
         }
         
+    }
+
+    public function addTracks(int $playlist_id)
+    {
+        $playlist = Playlist::find($playlist_id);
+        $uri_array = ['spotify:track:0Y7Yef6MSkKWKxywghafzt', 'spotify:track:7eDf0HFE8ymjBPEyp4gLTO', 'spotify:track:0t8R66DymqgWq2BjureW9r'];
+        $spotify = new SpotifyService();
+        // foreach(json_decode($playlist->songs) as $song) {
+        //     try {
+        //     $response = $spotify->search($song->genre,$song->title,$song->artist);
+        //     if($response["tracks"]["items"][0]["type"] === "track")
+        //     if(in_array("ZA", $response["tracks"]["items"][0]["available_markets"]))
+        //         $uri_array[] = $response["tracks"]["items"][0]["uri"];
+        //     }
+        //     catch (\Exception $e) {
+        //     dd($e->getMessage());
+        //     } 
+        // }
+        // dd($uri_array);
+
+        try {
+            $spotify->addItemToPlaylist($playlist->external_id, $uri_array);
+            dd("Awe hond");
+        }
+        catch(\Exception $e) {
+            dd($e->getMessage());
+        }
     }
 }

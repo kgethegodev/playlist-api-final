@@ -13,6 +13,9 @@ Route::get('/user', function (Request $request) {
 Route::group(['prefix' => 'v1'], function() {
     Route::group(['prefix' => 'playlist'], function() {
         Route::post('create', [PlaylistController::class, 'create'])->middleware(SpotifyTokenRefresh::class);
+        Route::group(['prefix' => '{playlist_id}'], function() {
+            Route::post('add-tracks', [PlaylistController::class, 'addTracks']);
+        });
     });
 
     Route::get('/callback', [SpotifyController::class, 'callback']);

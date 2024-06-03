@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class GeminiService
 {
@@ -19,6 +20,7 @@ class GeminiService
         if($response->status() === 200){
             return $response->json();
         } else {
+            Log::error($response);
             throw($response->toException());
         }
     }
