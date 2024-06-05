@@ -32,7 +32,7 @@ class SpotifyTokenRefresh
             }
 
             SpotifyToken::create([
-                'state'                     => $state,
+                'state'                 => $state,
                 'spotify_access_token'  => $data['access_token'],
                 'expires_at'            => now()->addSeconds($data['expires_in'])
             ]);

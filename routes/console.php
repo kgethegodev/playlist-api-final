@@ -3,6 +3,7 @@
 use App\Models\Playlist;
 use App\Services\GeminiService;
 use App\Services\SpotifyService;
+use App\Services\WhatsappService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
@@ -23,7 +24,7 @@ Artisan::command('spotify:me', function() {
   catch(\Exception $e){
     dd($e->getMessage());
   }
-  
+
 });
 
 Artisan::command('spotify:add', function() {
@@ -39,7 +40,7 @@ Artisan::command('spotify:add', function() {
     }
     catch (\Exception $e) {
       dd($e->getMessage());
-    } 
+    }
   }
 
   try {
@@ -49,4 +50,20 @@ Artisan::command('spotify:add', function() {
   catch(\Exception $e) {
     dd($e->getMessage());
   }
+});
+
+Artisan::command('whatsapp:send', function () {
+    $to = "0659114806";
+    $name = "Kgethego Masilo";
+    $url = "https://baee-2c0f-f4c0-902a-a5e0-312a-8f94-2f45-3fca.ngrok-free.app/";
+
+    $whatsapp = new WhatsappService();
+
+    try {
+        $response = $whatsapp->sendPlaylist($to, $name, $url);
+        dd($response);
+
+    } catch (\Exception $e) {
+        dd($e);
+    }
 });

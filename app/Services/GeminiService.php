@@ -14,6 +14,9 @@ class GeminiService
                 'parts' => [
                     'text' => $prompt
                 ]
+            ],
+            'generationConfig' => [
+                'temperature' => 0
             ]
         ]);
 

@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Http;
 
 class SpotifyService
 {
-    public $access_token = '';
-    public $user_id;
+    public string $access_token = '';
+    public mixed $user_id;
 
     public function __construct()
     {
@@ -47,8 +47,6 @@ class SpotifyService
             'Content-Length' => 0,
         ])->post(config('spotify.url') . '/playlists/' . $playlist_id . '/tracks', $data);
 
-        dd($response);
-
         if($response->status() === 200){
             return $response->json();
         } else {
@@ -56,14 +54,14 @@ class SpotifyService
         }
     }
 
-    public function search($genre, $title, $artist, $type = 'track')
+    public function search($genre, $title, $artist, $album, $type = 'track')
     {
         $response = Http::withToken($this->access_token)->get(config('spotify.url') . '/search', [
-            'q' => 'genre' . $genre . 'track' . $title . 'artist' . $artist . 'market ZA',
+            'q' => 'track' . $title . 'artist' . $artist . 'album' . $album . 'genre' . $genre,
             'type' => $type
         ]);
 
-        
+
         if($response->status() === 200){
             return $response->json();
         } else {
@@ -73,7 +71,7 @@ class SpotifyService
 
     public function me() {
         $response = Http::withToken($this->access_token)->get(config('spotify.url') . '/me');
-        
+
         if($response->status() === 200){
             return $response->json();
         } else {

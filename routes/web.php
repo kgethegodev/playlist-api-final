@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\ProfileController;
 use App\Models\SpotifyToken;
 use App\Services\SpotifyService;
@@ -8,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
+Route::get('/', [PlaylistController::class, 'index'])->name('home');
 Route::get('/login', function () {
     $state = csrf_token();
     SpotifyToken::create(['state' => $state]);
@@ -55,19 +56,6 @@ Route::get('/callback', function (Request $request) {
     return redirect('/');
 });
 
-Route::get('/', function () {
-    $spotify = new SpotifyService();
-
-    try{
-      // $spotify->auth();
-      $response = $spotify->me();
-      dd($response);
-    }
-    catch(\Exception $e){
-      dd($e->getMessage());
-    }
-    
-});
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
