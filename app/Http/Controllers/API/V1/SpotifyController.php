@@ -15,11 +15,11 @@ class SpotifyController extends Controller
         $state = $request->input('state');
 
         $spotify_token = SpotifyToken::query()->where('state', $state)->firstOrFail();
-    
+
         if (!$spotify_token) {
             abort(403, 'Invalid state');
         }
-    
+
         $response = Http::asForm()->post('https://accounts.spotify.com/api/token', [
             'grant_type' => 'authorization_code',
             'code' => $code,
@@ -27,9 +27,9 @@ class SpotifyController extends Controller
             'client_id' => config('spotify.client_id'),
             'client_secret' => config('spotify.client_secret'),
         ]);
-    
+
         $data = $response->json();
-    
+
         $accessToken = $data['access_token'];
         $refreshToken = $data['refresh_token'];
         $expiresIn = $data['expires_in'];
@@ -48,7 +48,7 @@ class SpotifyController extends Controller
             'spotify_refresh_token'     => $refreshToken,
             'expires_at'                => now()->addSeconds($expiresIn)
         ]);
-    
-        return response()->json($token);
+
+        return response()->json(['message' => 'Awe']);
     }
 }
