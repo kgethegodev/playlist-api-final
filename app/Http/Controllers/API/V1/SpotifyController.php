@@ -49,6 +49,6 @@ class SpotifyController extends Controller
             'expires_at'                => now()->addSeconds($expiresIn)
         ]);
 
-        return response()->json(['message' => 'Awe']);
+        return redirect('/');
     }
 }
