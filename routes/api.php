@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\V1\AuthController;
 use App\Http\Controllers\API\V1\PlaylistController;
 use App\Http\Controllers\API\V1\SpotifyController;
 use App\Http\Middleware\SpotifyTokenRefresh;
@@ -12,7 +13,15 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::group(['prefix' => 'v1'], function() {
-    Route::group(['prefix' => 'playlist'], function() {
+    Route::prefix('auth')->group(function () {
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/verify', [AuthController::class, 'verifyAccount']);
+    });
+
+    Route::group(['prefix' => 'playlist', 'middleware' => ['auth:api', 'verified']], function() {
+        Route::get('/', [PlaylistController::class, 'index']);
         Route::post('create', [PlaylistController::class, 'create'])->middleware(SpotifyTokenRefresh::class)->name('create.playlist');
         Route::group(['prefix' => '{playlist_id}'], function() {
             Route::post('add-tracks', [PlaylistController::class, 'addTracks'])->middleware(SpotifyTokenRefresh::class);

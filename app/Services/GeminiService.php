@@ -23,7 +23,7 @@ class GeminiService
         if($response->status() === 200){
             return $response->json();
         } else {
-            Log::error($response);
+//            Log::error($response);
             throw($response->toException());
         }
     }

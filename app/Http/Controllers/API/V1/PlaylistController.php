@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CreatePlaylist;
 use App\Models\Playlist;
+use App\Models\User;
 use App\Services\GeminiService;
 use App\Services\SpotifyService;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,78 +20,33 @@ use function Laravel\Prompts\error;
 
 class PlaylistController extends Controller
 {
+    public ?Authenticatable $user;
+    public function __construct()
+    {
+        $this->user = auth('api')->user();
+    }
+
+    /**
+     * Get all playlists
+     *
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
+    {
+        $playlists = Playlist::all();
+
+        return response()->json($playlists);
+    }
+
     public function create(Request $request): JsonResponse|Response
     {
         $request->validate([
             'prompt' => ['required', 'string'],
-            'name' => ['required', 'string'],
-            'contact_number' => ['required', 'string'],
         ]);
 
-        $geminiService = new GeminiService();
+        dispatch(new CreatePlaylist($request->get('prompt')));
 
-        try {
-            $response = $geminiService->generateContent('Create a playlist of songs based on this query: ' . $request->input('prompt') . ', Make sure these songs exist on Spotify. Use the JSON format given below.
-            "{ \"title\": \"Hip Hop Playlist\", \"description\": \"Dope hip hop playlist\", \"tracks\": [
-                    { \"title\": \"Marvins Room\", \"artist\": \"Drake\", \"genre\": \"Hip Hop\", \"album\": \"Take Care\"},\n
-                    { \"title\": \"Good News\", \"artist\": \"Mac Miller\", \"genre\": \"Hip Hop\", \"album\": \"Circles\" },\n
-                    etc
-                ]
-               }"
-            ');
-
-            if(str_contains($response["candidates"][0]["content"]["parts"][0]["text"], '```json')) {
-                $input_string = json_decode(str_replace(['```json','```'],'',$response["candidates"][0]["content"]["parts"][0]["text"]));
-            } else {
-                $input_string = json_decode($response["candidates"][0]["content"]["parts"][0]["text"]);
-            }
-
-            // Extract the title
-            $title = $input_string->title ?? '';
-
-            // Extract the description
-            $description = $input_string->description ?? '';
-
-            // Decode the JSON string
-            $songs = $input_string->tracks ?? '';
-
-            if(!$title || !$description || !$songs){
-                Log::error(json_encode([
-                    'message'       => 'input missing',
-                    'response'      => $response,
-                    'input_string'  => $input_string,
-                    'title'         => trim($title),
-                    'description'   => trim($description),
-                    'songs'         => $songs
-                ]));
-
-                return Inertia::render('Home', [
-                    'message'   => 'Oops something went wrong.',
-                    'status'    => 'failed'
-                ]);
-            }
-
-            Playlist::create([
-                'title'             => $title,
-                'description'       => $description,
-                'songs'             => json_encode($songs),
-                'name'              => $request->input('name'),
-                'contact_number'    => $request->input('contact_number'),
-            ]);
-
-            return Inertia::render('Home', [
-                'message'   => 'Playlist created.',
-                'status'    => 'success'
-            ]);
-        }
-        catch(\Exception $e) {
-            Log::error($e->getMessage());
-
-            return Inertia::render('Home', [
-                'message'   => 'Oops something went wrong.',
-                'status'    => 'failed'
-            ]);
-        }
+        return response()->json(['message' => 'Playlists being created.']);
     }
 
     public function addTracks(int $playlist_id)

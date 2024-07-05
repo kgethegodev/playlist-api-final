@@ -61,7 +61,7 @@ class CreateAndPopulateSpotifyPlaylist implements ShouldQueue
                 Log::error($e->getMessage());
             }
 
-            SendWhatsAppMessage::dispatch($this->playlist);
+//            SendWhatsAppMessage::dispatch($this->playlist);
         }
         catch (\Exception $e) {
             Log::error($e->getMessage());

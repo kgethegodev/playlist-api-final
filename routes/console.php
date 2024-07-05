@@ -1,12 +1,15 @@
 <?php
 
+use App\Mail\VerifyAccount;
 use App\Models\Playlist;
+use App\Models\User;
 use App\Services\GeminiService;
 use App\Services\SpotifyService;
 use App\Services\WhatsappService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
+use Illuminate\Support\Facades\Mail;
 use function Laravel\Prompts\error;
 
 Artisan::command('inspire', function () {
@@ -66,4 +69,24 @@ Artisan::command('whatsapp:send', function () {
     } catch (\Exception $e) {
         dd($e);
     }
+});
+
+Artisan::command('user:mail', function () {
+    $mailConfig = [
+        'driver' => env('MAIL_DRIVER'),
+        'host' => env('MAIL_HOST'),
+        'port' => env('MAIL_PORT'),
+        'from' => [
+            'address' => env('MAIL_FROM_ADDRESS'),
+            'name' => env('MAIL_FROM_NAME'),
+        ],
+        'encryption' => env('MAIL_ENCRYPTION'),
+        'username' => env('MAIL_USERNAME'),
+        'password' => env('MAIL_PASSWORD'),
+    ];
+
+    \Illuminate\Support\Facades\Config::set('mail', $mailConfig);
+    $user = User::query()->findOrFail(3);
+
+    Mail::to($user)->send(new VerifyAccount($user));
 });

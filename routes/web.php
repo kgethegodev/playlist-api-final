@@ -67,4 +67,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// require __DIR__.'/auth.php';
+Route::get('verify', function (){
+    $user = \App\Models\User::query()->findOrFail(3);
+    $verification_url = "";
+
+    return view('emails.verify', compact('user', 'verification_url'));
+});
+
+Route::prefix('auth')->group(function () {
+    Route::get('/verify', function (Request $request) {
+        return Inertia::render('Auth/VerifyAccount', ['token' => $request->token]);
+    });
+});

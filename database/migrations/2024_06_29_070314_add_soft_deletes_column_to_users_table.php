@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('playlists', function (Blueprint $table) {
-            $table->enum('streaming_service', ['SPOTIFY','APPLE_MUSIC'])->default('SPOTIFY')->after('songs');
+        Schema::table('users', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('playlists', function (Blueprint $table) {
-            $table->dropColumn('streaming_service');
+        Schema::table('users', function (Blueprint $table) {
+            //
         });
     }
 };

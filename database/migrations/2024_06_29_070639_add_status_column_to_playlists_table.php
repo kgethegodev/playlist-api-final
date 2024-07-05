@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('playlists', function (Blueprint $table) {
-            $table->enum('streaming_service', ['SPOTIFY','APPLE_MUSIC'])->default('SPOTIFY')->after('songs');
+            $table->enum('status', ['PENDING', 'CREATED','FAILED','UPDATE'])->default('PENDING');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('playlists', function (Blueprint $table) {
-            $table->dropColumn('streaming_service');
+            $table->dropColumn('status');
         });
     }
 };
